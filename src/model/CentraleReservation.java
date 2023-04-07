@@ -1,25 +1,26 @@
 package model;
 
-public class CentraleReservation<T> {
-	private T[] tabEntite;
+public class CentraleReservation<E extends EntiteReservable<F>, F extends Formulaire> {
+	private E[] tabEntite;
 	private int nbEntite;
 	
-	public CentraleReservation(T[] tabEntite) {
-		this.tabEntite = tabEntite;
-		this.nbEntite = tabEntite.length;
-	}
 	
-	public int ajouterEntite(T entite) {
+	public CentraleReservation(E[] tabEntite) {
+		this.tabEntite = tabEntite;
+		this.nbEntite = 0;
+	}
+
+	public int ajouterEntite(E entite) {
 		tabEntite[nbEntite]=entite;
 		nbEntite++;
-		return (nbEntite-1);
+		return (nbEntite);
 	}
 	
-	public int[] donnerPossibilites(FormulaireRestaurant formulaire) {
+	public int[] donnerPossibilites(F formulaire) {
 		int[] tabPossibilite= new int[tabEntite.length];
 		for (int i = 0; i < tabEntite.length; i++) {
-			if (((EntiteReservable) tabEntite[i]).compatible(formulaire)) {
-				tabPossibilite[i]=((EntiteReservable) tabEntite[i]).getNumero();
+			if (tabEntite[i].compatible(formulaire)) {
+				tabPossibilite[i]=i+1;
 			}else {
 				tabPossibilite[i]=0;
 			}
@@ -27,18 +28,16 @@ public class CentraleReservation<T> {
 		return tabPossibilite;
 	}
 	
-	public ReservationRestaurant reserver(int numEntite, FormulaireRestaurant formulaire) {
+	public Reservation reserver(int numEntite, F formulaire) {
 		int[] possibilite=donnerPossibilites(formulaire);
-		int num=0;
-		for (int i = 0; i < possibilite.length; i++) {
-			if(possibilite[i]==numEntite) {
-				num=possibilite[i];
-			}
+		if(possibilite!=null) {
+			int i;
+			for (i = 0; i < possibilite.length && possibilite[i]!=numEntite; ++i);
+			formulaire.setIdentificationEntite(i);
+			return tabEntite[i-1].reserver(formulaire);
+			
 		}
-		
-		formulaire.setIdentificationEntite(num);
-		return ((EntiteReservable) tabEntite[num-1]).reserver(formulaire);
-		
+		return null;
 	}
 	
 }

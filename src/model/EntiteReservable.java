@@ -1,6 +1,6 @@
 package model;
 
-public class EntiteReservable {
+public abstract class EntiteReservable < T extends Formulaire> {
 	private CalendrierAnnuel calendrier;
 	private int numero;
 	
@@ -16,31 +16,14 @@ public class EntiteReservable {
 		this.numero = num;
 	}
 	
-	public boolean estLibre(FormulaireRestaurant formulaire) {
+	public boolean estLibre(T formulaire) {
 		int jour=formulaire.getJour();
 		int mois=formulaire.getMois();
 		
 		return calendrier.estLibre(jour,mois);
 	}
 	
-	public boolean compatible(FormulaireRestaurant formulaire) {
-		return formulaire.getIdentificationEntite()==numero;
-	}
+	public abstract boolean compatible(T formulaire);
 	
-	public ReservationRestaurant reserver(FormulaireRestaurant formulaire) {
-		if (compatible(formulaire)) {
-			int jour=formulaire.getJour();
-			int mois=formulaire.getMois();
-			int nbPersonnes=formulaire.getNombrePersonnes();
-			int numService= formulaire.getNumService();
-			
-			ReservationRestaurant reservation= new ReservationRestaurant(jour,mois,numService,nbPersonnes);
-			return reservation;
-			
-		}
-		return null;
-	}
-	
-	
-	
+	public abstract Reservation reserver(T formulaire);
 }
